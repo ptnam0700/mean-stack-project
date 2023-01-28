@@ -1,8 +1,9 @@
 const express = require('express');
+const path = require('path')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 
-const Post = require('./models/post');
+const postsRouter = require("./routes/posts")
 
 const app = express();
 
@@ -18,6 +19,7 @@ mongoose.connect(uri)
     console.log('Failed to connect')
   });
 app.use(bodyParser.json());
+app.use("/images/", express.static(path.join("backend/images")));
 
 // Add headers before the routes are defined
 app.use(function (req, res, next) {
@@ -39,38 +41,6 @@ app.use(function (req, res, next) {
   next();
 })
 
-app.post('/api/posts', (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content
-  })
-  post.save().then((createdPost) => {
-    res.status(201).json({
-      message: 'Post added successfully',
-      post: createdPost
-    })
-  });
-})
-
-app.get('/api/posts',(req, res, next) => {
-  Post.find()
-    .then((documents) => {
-      res.status(200).json({
-        message: "Fetch posts successfully",
-        posts: documents
-      })
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-
-});
-
-app.delete('/api/posts/:id',(req, res, next) => {
-  Post.deleteOne({_id: req.params.id})
-    .then(() => {
-      res.status(201).json({ message: "Post Deleted" })
-    })
-});
+app.use("/api/posts", postsRouter)
 
 module.exports = app;
