@@ -15,7 +15,8 @@ mongoose.connect(uri)
   .then(() => {
     console.log('Connected to database')
   })
-  .catch(() => {
+  .catch((error) => {
+    console.log(error);
     console.log('Failed to connect')
   });
 app.use(bodyParser.json());
